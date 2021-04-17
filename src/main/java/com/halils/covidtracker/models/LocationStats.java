@@ -1,6 +1,6 @@
 package com.halils.covidtracker.models;
 
-public class LocationStatistics {
+public class LocationStats {
 
     private String state;
     private String country;
@@ -32,7 +32,7 @@ public class LocationStatistics {
 
     @Override
     public String toString() {
-        return "LocationStatistics{" +
+        return "LocationStats{" +
                 "state='" + state + '\'' +
                 ", country='" + country + '\'' +
                 ", latestTotalCases=" + latestTotalCases +

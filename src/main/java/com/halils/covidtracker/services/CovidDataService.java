@@ -1,6 +1,6 @@
 package com.halils.covidtracker.services;
 
-import com.halils.covidtracker.models.LocationStatistics;
+import com.halils.covidtracker.models.LocationStats;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,13 +21,16 @@ public class CovidDataService {
 
     private static final String COVID_DATA_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv";
 
-    private List<LocationStatistics> allStatistics = new ArrayList<>();
+    private List<LocationStats> allStats = new ArrayList<>();
 
+    public List<LocationStats> getAllStats() {
+        return allStats;
+    }
 
     @PostConstruct
     @Scheduled(cron = "* * 1 * * *")
     public void fetchCovidData () throws IOException, InterruptedException {
-        List<LocationStatistics> newStatistics = new ArrayList<>();
+        List<LocationStats> newStats = new ArrayList<>();
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(COVID_DATA_URL))
@@ -36,13 +39,12 @@ public class CovidDataService {
         StringReader csvBodyReader = new StringReader(httpResponse.body());
         Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(csvBodyReader);
         for (CSVRecord record : records) {
-            LocationStatistics locationStatistics = new LocationStatistics();
-            locationStatistics.setState(record.get("Province/State"));
-            locationStatistics.setCountry(record.get("Country/Region"));
-            locationStatistics.setLatestTotalCases(Integer.parseInt(record.get(record.size() -1)));
-            System.out.println(locationStatistics);
-            newStatistics.add(locationStatistics);
+            LocationStats locationStat = new LocationStats();
+            locationStat.setState(record.get("Province/State"));
+            locationStat.setCountry(record.get("Country/Region"));
+            locationStat.setLatestTotalCases(Integer.parseInt(record.get(record.size() -1)));
+            newStats.add(locationStat);
         }
-        this.allStatistics = newStatistics;
+        this.allStats = newStats;
     }
 }
